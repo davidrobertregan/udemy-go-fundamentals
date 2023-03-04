@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"io"
 )
-	
+
+type logWriter struct {}
 
 func main() {
 	resp, err := http.Get("http://google.com")
@@ -15,5 +17,13 @@ func main() {
 	}
 	/* resp is response object */
 
-	fmt.Println(resp)
+	lw := logWriter{}
+
+	io.Copy(lw, resp.Body)
+}
+
+func (logWriter) Write(bs []byte) (int, error) {
+	fmt.Println(string(bs))
+	fmt.Println("byte count:", len(bs))
+	return len(bs), nil
 }
